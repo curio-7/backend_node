@@ -5,6 +5,7 @@
 import {v2 as cloudinary} from "cloudinary"
 import fs from "fs"
 import dotenv from "dotenv";
+import { ApiError } from "./ApiError.js";
 dotenv.config();
           
 cloudinary.config({ 
@@ -30,5 +31,17 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-export {uploadOnCloudinary};
+const deleteFromCloudinary = async (publicId) => {
+    try {
+        if(!publicId) return null
+        const response = await cloudinary.uploader.destroy(publicId, {
+            resource_type: "auto"
+        })
+        return response;
+    } catch (error) {
+        throw new ApiError(500,"Failed to delete from Cloudinary")
+    }
+}
+
+export {uploadOnCloudinary,deleteFromCloudinary};
 
