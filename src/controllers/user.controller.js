@@ -294,16 +294,33 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
     //TODO: delete old image 
     //get the path of image that is uploaded from db and take out public id from it 
     //then delete them
-    const {avatar} = req.body
-    console.log(typeof avatar)
+    // const {avatar} = req.body
+    // console.log(typeof avatar)
+    // const getPublicId = (path) => {
+    //     if (typeof path === 'object') {
+    //         path = path.imagePath;
+    //     }
+    //     return path?.split("/").pop().split(".")[0];
+    //   };
+    // const publicID = getPublicId(avatar);
+    // console.log(publicID)
+    // await deleteFromCloudinary(publicID);
+    //Wnat we have to do here is that we have to get oldAvatar from our db and deelte that same from our cloudinary,then update that avatar with the new one.
+
+
+    const oldAvatar = await User.findById(req.params.id).select('avatar')
+    // console.log(req.params.id);
+    // console.log(oldAvatar);
+    // console.log(typeof oldAvatar);
     const getPublicId = (path) => {
         if (typeof path === 'object') {
-            path = path.imagePath;
+            path = path.avatar;
         }
         return path?.split("/").pop().split(".")[0];
-      };
-    const publicID = getPublicId(avatar);
-    console.log(publicID)
+    };
+
+    const publicID = getPublicId(oldAvatar);
+    // console.log(publicID)
     await deleteFromCloudinary(publicID);
 
     const avatarUpdate = await uploadOnCloudinary(avatarLocalPath)
@@ -337,8 +354,6 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
     if (!coverImageLocalPath) {
         throw new ApiError(400, "Cover image file is missing")
     }
-
-    //TODO: delete old image - assignment
 
 
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
